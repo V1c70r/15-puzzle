@@ -32,7 +32,7 @@ export class Puzzle implements Service {
     this.i18n = i18n;
   }
 
-  public async start() {
+  public async start(): Promise<void> {
     this.storage.start();
     this.display.start();
     this.input.start();
@@ -56,7 +56,7 @@ export class Puzzle implements Service {
     }
   }
 
-  public stop() {
+  public stop(): void {
     this.saveBoard();
 
     this.display.showMessage(this.i18n.goodbye);
@@ -69,7 +69,7 @@ export class Puzzle implements Service {
     process.exit();
   }
 
-  private processCommand(command: Command) {
+  private processCommand(command: Command): void {
     switch (command.type) {
       case 'move':
         this.moveNumber(command.number);
@@ -89,7 +89,7 @@ export class Puzzle implements Service {
     }
   }
 
-  private moveNumber(number: number) {
+  private moveNumber(number: number): void {
     if (this.board.move(number)) {
       this.drawState();
 
@@ -102,7 +102,7 @@ export class Puzzle implements Service {
     }
   }
 
-  private createNewBoard() {
+  private createNewBoard(): void {
     this.board = new Board({ config: this.boardConfig });
 
     this.display.showMessage(this.i18n.newGameCreated);
@@ -111,12 +111,12 @@ export class Puzzle implements Service {
     this.saveBoard();
   }
 
-  private showUnknownError() {
+  private showUnknownError(): void {
     this.display.showError(this.i18n.unknownCommand);
     this.display.showMessage(this.i18n.help);
   }
 
-  private loadBoard() {
+  private loadBoard(): void {
     const state = this.storage.load();
     if (state) {
       this.board = new Board({ config: this.boardConfig, state });
@@ -125,12 +125,12 @@ export class Puzzle implements Service {
     }
   }
 
-  private saveBoard() {
+  private saveBoard(): void {
     this.storage.save(this.board.getState());
     this.display.showMessage(this.i18n.gameSaved);
   }
 
-  private drawState() {
+  private drawState(): void {
     this.display.drawState(this.board.getState());
   }
 }

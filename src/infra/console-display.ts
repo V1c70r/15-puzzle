@@ -47,15 +47,16 @@ export class ConsoleDisplay implements Display {
     this.print();
   }
 
-  private formatNumber(number: number) {
+  private formatNumber(number: number): string {
     if (!number) {
       return this.spaces;
     }
 
-    return (this.spaces + number).slice(-this.numberWidth);
+    return (this.spaces + number.toString()).slice(-this.numberWidth);
   }
 
-  private print(...strings: string[]) {
+  private print(...strings: string[]): void {
+    // eslint-disable-next-line no-console
     console.log(...strings);
   }
 }

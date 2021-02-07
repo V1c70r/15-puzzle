@@ -8,7 +8,7 @@ import { ConsoleDisplay } from './infra/console-display';
 /**
  * Starts the game.
  */
-export async function bootstrap() {
+export async function bootstrap(): Promise<void> {
   const storage = new FileStorage({ config: config.storage });
   const display = new ConsoleDisplay({ boardConfig: config.board });
   const i18n = new EnI18n({ boardConfig: config.board });

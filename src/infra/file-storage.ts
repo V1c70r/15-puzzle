@@ -18,6 +18,7 @@ export class FileStorage implements Storage {
 
   public load(): BoardState | undefined {
     if (fs.existsSync(this.config.filePath)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return JSON.parse(fs.readFileSync(this.config.filePath).toString());
     }
   }

@@ -62,7 +62,7 @@ export class Board {
    * @returns false if a number can't be moved.
    */
   public move(number: number): boolean {
-    const isValidNumber = 1 <= number && number <= this.config.maxNumber;
+    const isValidNumber = number >= 1 && number <= this.config.maxNumber;
     if (!isValidNumber) {
       return false;
     }
@@ -138,7 +138,7 @@ export class Board {
   }
 
   private isValidCoordinate(coordinate: number): boolean {
-    return 0 <= coordinate && coordinate < this.config.sideSize;
+    return coordinate >= 0 && coordinate < this.config.sideSize;
   }
 
   private isValidCoordinates(x: number, y: number): boolean {
@@ -148,7 +148,7 @@ export class Board {
   /**
    * @throws {Error} Throws an error for wrong coordinates.
    */
-  private checkCoordinates(x: number, y: number) {
+  private checkCoordinates(x: number, y: number): void {
     if (!this.isValidCoordinates(x, y)) {
       throw new Error(`Wrong coordinates (${x}, ${y}).`);
     }
@@ -157,7 +157,7 @@ export class Board {
   /**
    * @throws {Error} Throws an error for wrong coordinates.
    */
-  private swap(x0: number, y0: number, x1: number, y1: number) {
+  private swap(x0: number, y0: number, x1: number, y1: number): void {
     const number0 = this.getNumber(x0, y0);
     const number1 = this.getNumber(x1, y1);
 

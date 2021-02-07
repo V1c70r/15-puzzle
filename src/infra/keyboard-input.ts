@@ -9,7 +9,7 @@ export class KeyboardInput implements Input {
   private readonly i18n: I18n;
   private input!: readline.Interface;
 
-  constructor({ i18n }: { i18n: I18n }) {
+  public constructor({ i18n }: { i18n: I18n }) {
     this.i18n = i18n;
   }
 
