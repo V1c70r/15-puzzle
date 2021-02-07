@@ -17,22 +17,22 @@ export class Board {
   /**
    * The size of board's side.
    */
-  private readonly config: BoardConfig;
+  protected readonly config: BoardConfig;
 
   /**
    * Numbers inside a board.
    */
-  private readonly numbers: number[][];
+  protected readonly numbers: number[][];
 
   /**
    * X position of the empty space.
    */
-  private x: number;
+  protected x: number;
 
   /**
    * Y position of the empty space.
    */
-  private y: number;
+  protected y: number;
 
   public constructor({ config, state }: { config: BoardConfig; state?: BoardState }) {
     this.config = config;
@@ -46,7 +46,7 @@ export class Board {
     this.numbers = state.numbers;
   }
 
-  private createRandomState(): BoardState {
+  protected createRandomState(): BoardState {
     const numbers = chunk(shuffle(range(this.config.maxNumber + 1)), this.config.sideSize);
 
     const [x, y] = numbers.flatMap((rows, y) => {
@@ -90,7 +90,7 @@ export class Board {
     return true;
   }
 
-  private canMove(number: number): MoveDirection | undefined {
+  protected canMove(number: number): MoveDirection | undefined {
     if (this.getNumberOrUndefined(this.x, this.y + 1) === number) {
       return 'up';
     }
@@ -111,7 +111,7 @@ export class Board {
   /**
    * @throws {Error} Throws an error for wrong coordinates.
    */
-  private getNumber(x: number, y: number): number {
+  protected getNumber(x: number, y: number): number {
     this.checkCoordinates(x, y);
 
     return this.numbers[y][x];
@@ -120,7 +120,7 @@ export class Board {
   /**
    * @returns Returns undefined for wrong coordinates.
    */
-  private getNumberOrUndefined(x: number, y: number): number | undefined {
+  protected getNumberOrUndefined(x: number, y: number): number | undefined {
     if (!this.isValidCoordinates(x, y)) {
       return;
     }
@@ -131,24 +131,24 @@ export class Board {
   /**
    * @throws {Error} Throws an error for wrong coordinates.
    */
-  private setNumber(x: number, y: number, number: number): void {
+  protected setNumber(x: number, y: number, number: number): void {
     this.checkCoordinates(x, y);
 
     this.numbers[y][x] = number;
   }
 
-  private isValidCoordinate(coordinate: number): boolean {
+  protected isValidCoordinate(coordinate: number): boolean {
     return coordinate >= 0 && coordinate < this.config.sideSize;
   }
 
-  private isValidCoordinates(x: number, y: number): boolean {
+  protected isValidCoordinates(x: number, y: number): boolean {
     return this.isValidCoordinate(x) && this.isValidCoordinate(y);
   }
 
   /**
    * @throws {Error} Throws an error for wrong coordinates.
    */
-  private checkCoordinates(x: number, y: number): void {
+  protected checkCoordinates(x: number, y: number): void {
     if (!this.isValidCoordinates(x, y)) {
       throw new Error(`Wrong coordinates (${x}, ${y}).`);
     }
@@ -157,7 +157,7 @@ export class Board {
   /**
    * @throws {Error} Throws an error for wrong coordinates.
    */
-  private swap(x0: number, y0: number, x1: number, y1: number): void {
+  protected swap(x0: number, y0: number, x1: number, y1: number): void {
     const number0 = this.getNumber(x0, y0);
     const number1 = this.getNumber(x1, y1);
 

@@ -7,7 +7,7 @@ import { BoardConfig } from 'src/domain/board';
  * English internationalization.
  */
 export class EnI18n implements I18n {
-  private readonly boardConfig: BoardConfig;
+  protected readonly boardConfig: BoardConfig;
 
   public readonly inputPrompt = '> ';
   public readonly greeting = 'Come in, Chosen One.';
