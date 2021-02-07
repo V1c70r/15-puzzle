@@ -20,6 +20,6 @@ export const config: Config = {
 };
 
 interface Config {
-  board: BoardConfig,
-  storage: FileStorageConfig,
+  board: BoardConfig;
+  storage: FileStorageConfig;
 }

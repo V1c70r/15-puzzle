@@ -1,5 +1,5 @@
 import { Board, BoardConfig } from './board';
-import { Command, Display, I18n, Input, Service, Storage } from './contract'
+import { Command, Display, I18n, Input, Service, Storage } from './contract';
 
 /**
  * 15 puzzle game logic.
@@ -12,7 +12,13 @@ export class Puzzle implements Service {
   private readonly i18n: I18n;
   private board!: Board;
 
-  public constructor({ boardConfig, storage, display, input, i18n }: {
+  public constructor({
+    boardConfig,
+    storage,
+    display,
+    input,
+    i18n,
+  }: {
     boardConfig: BoardConfig;
     storage: Storage;
     display: Display;

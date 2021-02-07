@@ -24,8 +24,8 @@ export class EnI18n implements I18n {
   }
 
   public cantMoveNumber(number: number): string {
-    return `You can't move ${number}.`
-  };
+    return `You can't move ${number}.`;
+  }
 
   public start(): void {
     this.help = [
@@ -33,9 +33,9 @@ export class EnI18n implements I18n {
       'Allowed commands:',
       `  number from 1 to ${this.boardConfig.maxNumber} - move a number`,
       '  new - shuffle the puzzle',
-      '  exit - save and stop the game'
+      '  exit - save and stop the game',
     ].join(EOL);
   }
 
   public stop(): void {}
-};
+}

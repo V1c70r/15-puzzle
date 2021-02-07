@@ -1,9 +1,9 @@
 import { config } from './config';
-import { EnI18n } from "./infra/en-i18n";
-import { Puzzle } from "./domain/puzzle";
-import { FileStorage } from "./infra/file-storage";
-import { KeyboardInput } from "./infra/keyboard-input";
-import { ConsoleDisplay } from "./infra/console-display";
+import { EnI18n } from './infra/en-i18n';
+import { Puzzle } from './domain/puzzle';
+import { FileStorage } from './infra/file-storage';
+import { KeyboardInput } from './infra/keyboard-input';
+import { ConsoleDisplay } from './infra/console-display';
 
 /**
  * Starts the game.

@@ -11,9 +11,13 @@ export interface BoardState {
   x: number;
   y: number;
   numbers: number[][];
-};
+}
 
-export type Command = { type: 'move', number: number } | { type: 'new' } | { type: 'exit' } | { type: 'unknown' };
+export type Command =
+  | { type: 'move'; number: number }
+  | { type: 'new' }
+  | { type: 'exit' }
+  | { type: 'unknown' };
 
 export interface Storage extends Service {
   load(): BoardState | undefined;

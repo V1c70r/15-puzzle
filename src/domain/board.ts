@@ -1,6 +1,6 @@
 import { chunk, range, shuffle } from 'lodash';
 
-import { EMPTINESS, BoardState } from './contract'
+import { EMPTINESS, BoardState } from './contract';
 
 /**
  * Class to change and check the board state.
@@ -34,10 +34,7 @@ export class Board {
    */
   private y: number;
 
-  public constructor({ config, state } : {
-    config: BoardConfig;
-    state?: BoardState;
-  }) {
+  public constructor({ config, state }: { config: BoardConfig; state?: BoardState }) {
     this.config = config;
 
     if (!state) {
@@ -76,10 +73,18 @@ export class Board {
     }
 
     switch (numberMoveDirection) {
-      case 'up': this.swap(this.x, this.y + 1, this.x, this.y); break;
-      case 'down': this.swap(this.x, this.y - 1, this.x, this.y); break;
-      case 'left': this.swap(this.x + 1, this.y, this.x, this.y); break;
-      case 'right': this.swap(this.x - 1, this.y, this.x, this.y); break;
+      case 'up':
+        this.swap(this.x, this.y + 1, this.x, this.y);
+        break;
+      case 'down':
+        this.swap(this.x, this.y - 1, this.x, this.y);
+        break;
+      case 'left':
+        this.swap(this.x + 1, this.y, this.x, this.y);
+        break;
+      case 'right':
+        this.swap(this.x - 1, this.y, this.x, this.y);
+        break;
     }
 
     return true;

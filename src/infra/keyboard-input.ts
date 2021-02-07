@@ -16,7 +16,7 @@ export class KeyboardInput implements Input {
   public start(): void {
     this.input = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
   }
 
@@ -35,8 +35,10 @@ export class KeyboardInput implements Input {
 
   private stringToCommand(string: string): Command {
     switch (string) {
-      case 'new': return { type: 'new' };
-      case 'exit': return { type: 'exit' };
+      case 'new':
+        return { type: 'new' };
+      case 'exit':
+        return { type: 'exit' };
     }
 
     const asNumber = Number(string);
