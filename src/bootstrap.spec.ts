@@ -1,5 +1,5 @@
 describe('bootstrap', () => {
-  it('creates a puzzle with dependencies');
+  it.todo('creates a puzzle with dependencies');
 
-  it('starts a puzzle');
+  it.todo('starts a puzzle');
 });

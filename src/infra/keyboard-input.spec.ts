@@ -1,27 +1,27 @@
 describe('KeyboardInput', () => {
   describe('constructor', () => {
-    it('sets i18n');
+    it.todo('sets i18n');
   });
 
   describe('start', () => {
-    it('creates readline interface');
+    it.todo('creates readline interface');
   });
 
   describe('stop', () => {
-    it('closes readline interface');
+    it.todo('closes readline interface');
   });
 
   describe('getCommand', () => {
-    it('returns commands from string input');
+    it.todo('returns commands from string input');
   });
 
   describe('stringToCommand', () => {
-    it('returns new command for new string');
+    it.todo('returns new command for new string');
 
-    it('returns exit command for exit string');
+    it.todo('returns exit command for exit string');
 
-    it('returns move command for number string');
+    it.todo('returns move command for number string');
 
-    it('returns unknown command otherwise');
+    it.todo('returns unknown command otherwise');
   });
 });

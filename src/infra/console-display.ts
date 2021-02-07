@@ -7,7 +7,7 @@ import { BoardState, Display, EMPTINESS } from 'src/domain/contract';
  * Simple console display.
  */
 export class ConsoleDisplay implements Display {
-  private readonly maxNumberWidth: number;
+  protected readonly maxNumberWidth: number;
 
   public constructor({ boardConfig }: { boardConfig: BoardConfig }) {
     this.maxNumberWidth = boardConfig.maxNumber.toString().length;
@@ -45,7 +45,7 @@ export class ConsoleDisplay implements Display {
 
   private formatNumber(number: number): string {
     if (number === EMPTINESS) {
-      return ''.padStart(this.maxNumberWidth)
+      return ''.padStart(this.maxNumberWidth);
     }
 
     return number.toString().padStart(this.maxNumberWidth);

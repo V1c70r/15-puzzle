@@ -107,6 +107,7 @@ module.exports = {
       rules: {
         'max-lines-per-function': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/unbound-method': 'off',
         '@typescript-eslint/no-magic-numbers': 'off',
         '@typescript-eslint/no-unsafe-return': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'off',

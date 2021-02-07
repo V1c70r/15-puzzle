@@ -2,6 +2,8 @@
  * A contract between domain and infrastructure level.
  */
 
+import { BoardConfig } from './board';
+
 /**
  * A number to represent the empty space in the board.
  */
@@ -18,6 +20,14 @@ export type Command =
   | { type: 'new' }
   | { type: 'exit' }
   | { type: 'unknown' };
+
+export interface PuzzleDependencies {
+  boardConfig: BoardConfig;
+  storage: Storage;
+  display: Display;
+  input: Input;
+  i18n: I18n;
+}
 
 export interface Storage extends Service {
   load(): BoardState | undefined;

@@ -1,25 +1,25 @@
 describe('FileStorage', () => {
   describe('constructor', () => {
-    it('sets config');
+    it.todo('sets config');
   });
 
   describe('start', () => {
-    it('must not fail');
+    it.todo('must not fail');
   });
 
   describe('stop', () => {
-    it('must not fail');
+    it.todo('must not fail');
   });
 
   describe('load', () => {
-    it('retuns a state from the existed file');
+    it.todo('retuns a state from the existed file');
 
-    it('retuns undefined for a not existed file');
+    it.todo('retuns undefined for a not existed file');
 
-    it('loads data given to save method');
+    it.todo('loads data given to save method');
   });
 
   describe('save', () => {
-    it('saves a state to a file');
+    it.todo('saves a state to a file');
   });
 });

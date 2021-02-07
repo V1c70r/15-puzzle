@@ -1,30 +1,18 @@
 import { Board, BoardConfig } from './board';
-import { Command, Display, I18n, Input, Service, Storage } from './contract';
+import { Command, Display, I18n, Input, PuzzleDependencies, Service, Storage } from './contract';
 
 /**
  * 15 puzzle game logic.
  */
 export class Puzzle implements Service {
-  private readonly boardConfig: BoardConfig;
-  private readonly storage: Storage;
-  private readonly display: Display;
-  private readonly input: Input;
-  private readonly i18n: I18n;
-  private board!: Board;
+  protected readonly boardConfig: BoardConfig;
+  protected readonly storage: Storage;
+  protected readonly display: Display;
+  protected readonly input: Input;
+  protected readonly i18n: I18n;
+  protected board!: Board;
 
-  public constructor({
-    boardConfig,
-    storage,
-    display,
-    input,
-    i18n,
-  }: {
-    boardConfig: BoardConfig;
-    storage: Storage;
-    display: Display;
-    input: Input;
-    i18n: I18n;
-  }) {
+  public constructor({ boardConfig, storage, display, input, i18n }: PuzzleDependencies) {
     this.boardConfig = boardConfig;
     this.storage = storage;
     this.display = display;
@@ -47,16 +35,13 @@ export class Puzzle implements Service {
     }
 
     try {
-      while (true) {
-        this.processCommand(await this.input.getCommand());
-      }
+      await this.processingCycle();
     } catch (error) {
-      this.stop();
-      throw error;
+      this.stop(error);
     }
   }
 
-  public stop(): void {
+  public stop(error?: Error): void {
     this.saveBoard();
 
     this.display.showMessage(this.i18n.goodbye);
@@ -66,10 +51,24 @@ export class Puzzle implements Service {
     this.display.stop();
     this.storage.stop();
 
+    if (error) {
+      throw error;
+    } else {
+      this.stopProcess();
+    }
+  }
+
+  protected async processingCycle(): Promise<never> {
+    while (true) {
+      this.processCommand(await this.input.getCommand());
+    }
+  }
+
+  protected stopProcess(): never {
     process.exit();
   }
 
-  private processCommand(command: Command): void {
+  protected processCommand(command: Command): void {
     switch (command.type) {
       case 'move':
         this.moveNumber(command.number);
@@ -89,7 +88,7 @@ export class Puzzle implements Service {
     }
   }
 
-  private moveNumber(number: number): void {
+  protected moveNumber(number: number): void {
     if (this.board.move(number)) {
       this.drawState();
 
@@ -102,7 +101,7 @@ export class Puzzle implements Service {
     }
   }
 
-  private createNewBoard(): void {
+  protected createNewBoard(): void {
     this.board = new Board({ config: this.boardConfig });
 
     this.display.showMessage(this.i18n.newGameCreated);
@@ -111,12 +110,12 @@ export class Puzzle implements Service {
     this.saveBoard();
   }
 
-  private showUnknownError(): void {
+  protected showUnknownError(): void {
     this.display.showError(this.i18n.unknownCommand);
     this.display.showMessage(this.i18n.help);
   }
 
-  private loadBoard(): void {
+  protected loadBoard(): void {
     const state = this.storage.load();
     if (state) {
       this.board = new Board({ config: this.boardConfig, state });
@@ -125,12 +124,12 @@ export class Puzzle implements Service {
     }
   }
 
-  private saveBoard(): void {
+  protected saveBoard(): void {
     this.storage.save(this.board.getState());
     this.display.showMessage(this.i18n.gameSaved);
   }
 
-  private drawState(): void {
+  protected drawState(): void {
     this.display.drawState(this.board.getState());
   }
 }

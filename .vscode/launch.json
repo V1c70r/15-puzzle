@@ -15,12 +15,6 @@
     },
     {
       "type": "node",
-      "request": "attach",
-      "name": "attach",
-      "port": 9229
-    },
-    {
-      "type": "node",
       "request": "launch",
       "name": "debug tests",
       "skipFiles": [

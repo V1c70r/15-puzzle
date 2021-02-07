@@ -1,49 +1,45 @@
 describe('ConsoleDisplay', () => {
   describe('constructor', () => {
-    it('sets max number width');
+    it.todo('sets max number width');
 
-    it('sets spaces placeholder');
+    it.todo('sets spaces placeholder');
   });
 
   describe('start', () => {
-    it('must not fail');
+    it.todo('must not fail');
   });
 
   describe('stop', () => {
-    it('must not fail');
+    it.todo('must not fail');
   });
 
   describe('showMessage', () => {
-    it('prints given message');
+    it.todo('prints given message');
   });
 
   describe('showError', () => {
-    it('prints given error');
-  });
-
-  describe('showError', () => {
-    it('prints given error');
+    it.todo('prints given error');
   });
 
   describe('showCongratulation', () => {
-    it('prints given congratulation');
+    it.todo('prints given congratulation');
   });
 
   describe('drawState', () => {
-    it('prints the board numbers');
+    it.todo('prints the board numbers');
 
-    it('does not print the emptiness');
+    it.todo('does not print the emptiness');
   });
 
   describe('formatNumber', () => {
-    it('convers a number to a string');
+    it.todo('convers a number to a string');
 
-    it('pads a number');
+    it.todo('pads a number');
 
-    it('retunrs spaces for the emptiness');
+    it.todo('retunrs spaces for the emptiness');
   });
 
   describe('print', () => {
-    it('prints strings to console');
+    it.todo('prints strings to console');
   });
 });
