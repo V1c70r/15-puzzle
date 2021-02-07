@@ -51,7 +51,7 @@ export class Puzzle implements Service {
         this.processCommand(await this.input.getCommand());
       }
     } catch (error) {
-      this.saveBoard();
+      this.stop();
       throw error;
     }
   }

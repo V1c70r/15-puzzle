@@ -1,7 +1,5 @@
-import { repeat } from 'lodash';
-
 import { BoardConfig } from 'src/domain/board';
-import { BoardState, Display } from 'src/domain/contract';
+import { BoardState, Display, EMPTINESS } from 'src/domain/contract';
 
 // TODO add chalk
 
@@ -9,12 +7,10 @@ import { BoardState, Display } from 'src/domain/contract';
  * Simple console display.
  */
 export class ConsoleDisplay implements Display {
-  private readonly numberWidth: number;
-  private readonly spaces: string;
+  private readonly maxNumberWidth: number;
 
   public constructor({ boardConfig }: { boardConfig: BoardConfig }) {
-    this.numberWidth = boardConfig.maxNumber.toString().length;
-    this.spaces = repeat(' ', this.numberWidth);
+    this.maxNumberWidth = boardConfig.maxNumber.toString().length;
   }
 
   public start(): void {}
@@ -33,9 +29,9 @@ export class ConsoleDisplay implements Display {
     this.print();
   }
 
-  public showCongratulation(message: string): void {
+  public showCongratulation(congratulation: string): void {
     this.print();
-    this.print('!!!', message, '!!!');
+    this.print('!!!', congratulation, '!!!');
     this.print();
   }
 
@@ -48,11 +44,11 @@ export class ConsoleDisplay implements Display {
   }
 
   private formatNumber(number: number): string {
-    if (!number) {
-      return this.spaces;
+    if (number === EMPTINESS) {
+      return ''.padStart(this.maxNumberWidth)
     }
 
-    return (this.spaces + number.toString()).slice(-this.numberWidth);
+    return number.toString().padStart(this.maxNumberWidth);
   }
 
   private print(...strings: string[]): void {
