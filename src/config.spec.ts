@@ -1,25 +1,7 @@
-// import path from 'path';
+import { config } from './config';
 
-// import { BoardConfig } from './domain/board';
-// import { FileStorageConfig } from './infra/file-storage';
-
-// /**
-//  * The size of board's side.
-//  */
-// const BOARD_SIDE_SIZE = 4;
-
-// export const config: Config = {
-//   board: {
-//     sideSize: BOARD_SIDE_SIZE,
-//     maxNumber: BOARD_SIDE_SIZE * BOARD_SIDE_SIZE - 1,
-//   },
-//   storage: {
-//     filePath: path.resolve(__dirname, '..', 'data', 'state.json'),
-//     identInFile: 2,
-//   },
-// };
-
-// interface Config {
-//   board: BoardConfig;
-//   storage: FileStorageConfig;
-// }
+describe('config', () => {
+  it(`contains board's maximum number according to board's square size`, () => {
+    expect(config.board.maxNumber).toBe(config.board.sideSize ** 2 - 1);
+  });
+});
