@@ -1,6 +1,6 @@
 import { chunk, range, shuffle } from 'lodash';
 
-import { BOARD_MAX_NUMBER, BOARD_SIDE_SIZE } from 'src/config';
+import { EMPTINESS, BoardState } from './contract'
 
 /**
  * Class to change and check the board state.
@@ -12,15 +12,17 @@ import { BOARD_MAX_NUMBER, BOARD_SIDE_SIZE } from 'src/config';
  * |
  * V
  * y - axis
- *
- * 0 is represent the empty space.
  */
 export class Board {
   /**
-   * Number inside a board.
-   * 0 represents an empty space.
+   * The size of board's side.
    */
-  private numbers: number[][];
+  private readonly config: BoardConfig;
+
+  /**
+   * Numbers inside a board.
+   */
+  private readonly numbers: number[][];
 
   /**
    * X position of the empty space.
@@ -32,7 +34,12 @@ export class Board {
    */
   private y: number;
 
-  public constructor(state?: BoardState) {
+  public constructor({ config, state } : {
+    config: BoardConfig;
+    state?: BoardState;
+  }) {
+    this.config = config;
+
     if (!state) {
       state = this.createRandomState();
     }
@@ -43,10 +50,10 @@ export class Board {
   }
 
   private createRandomState(): BoardState {
-    const numbers = chunk(shuffle(range(BOARD_MAX_NUMBER + 1)), BOARD_SIDE_SIZE);
+    const numbers = chunk(shuffle(range(this.config.maxNumber + 1)), this.config.sideSize);
 
     const [x, y] = numbers.flatMap((rows, y) => {
-      const x = rows.indexOf(0);
+      const x = rows.indexOf(EMPTINESS);
       return x === -1 ? [] : [x, y];
     });
 
@@ -58,7 +65,7 @@ export class Board {
    * @returns false if a number can't be moved.
    */
   public move(number: number): boolean {
-    const isValidNumber = 1 <= number && number <= BOARD_MAX_NUMBER;
+    const isValidNumber = 1 <= number && number <= this.config.maxNumber;
     if (!isValidNumber) {
       return false;
     }
@@ -69,42 +76,48 @@ export class Board {
     }
 
     switch (numberMoveDirection) {
-      case MoveDirection.UP: this.swap(this.x, this.y + 1, this.x, this.y); break;
-      case MoveDirection.DOWN: this.swap(this.x, this.y - 1, this.x, this.y); break;
-      case MoveDirection.LEFT: this.swap(this.x + 1, this.y, this.x, this.y); break;
-      case MoveDirection.RIGHT: this.swap(this.x - 1, this.y, this.x, this.y); break;
+      case 'up': this.swap(this.x, this.y + 1, this.x, this.y); break;
+      case 'down': this.swap(this.x, this.y - 1, this.x, this.y); break;
+      case 'left': this.swap(this.x + 1, this.y, this.x, this.y); break;
+      case 'right': this.swap(this.x - 1, this.y, this.x, this.y); break;
     }
 
     return true;
   }
 
   private canMove(number: number): MoveDirection | undefined {
-    if (this.getNumber(this.x, this.y + 1, false) === number) {
-      return MoveDirection.UP;
+    if (this.getNumberOrUndefined(this.x, this.y + 1) === number) {
+      return 'up';
     }
 
-    if (this.getNumber(this.x, this.y - 1, false) === number) {
-      return MoveDirection.DOWN;
+    if (this.getNumberOrUndefined(this.x, this.y - 1) === number) {
+      return 'down';
     }
 
-    if (this.getNumber(this.x + 1, this.y, false) === number) {
-      return MoveDirection.LEFT;
+    if (this.getNumberOrUndefined(this.x + 1, this.y) === number) {
+      return 'left';
     }
 
-    if (this.getNumber(this.x - 1, this.y, false) === number) {
-      return MoveDirection.RIGHT;
+    if (this.getNumberOrUndefined(this.x - 1, this.y) === number) {
+      return 'right';
     }
   }
 
   /**
-   * @throws {Error} Throws an error for wrong coordinates if isThrowsEnabled is true.
-   *   Returns NaN for wrong coordinates if isThrowsEnabled is false.
+   * @throws {Error} Throws an error for wrong coordinates.
    */
-  private getNumber(x: number, y: number, isThrowsEnabled = true): number {
-    if (isThrowsEnabled) {
-      this.checkCoordinates(x, y);
-    } else if (!this.isValidCoordinates(x, y)) {
-      return NaN;
+  private getNumber(x: number, y: number): number {
+    this.checkCoordinates(x, y);
+
+    return this.numbers[y][x];
+  }
+
+  /**
+   * @returns Returns undefined for wrong coordinates.
+   */
+  private getNumberOrUndefined(x: number, y: number): number | undefined {
+    if (!this.isValidCoordinates(x, y)) {
+      return;
     }
 
     return this.numbers[y][x];
@@ -120,7 +133,7 @@ export class Board {
   }
 
   private isValidCoordinate(coordinate: number): boolean {
-    return 0 <= coordinate && coordinate < BOARD_SIDE_SIZE;
+    return 0 <= coordinate && coordinate < this.config.sideSize;
   }
 
   private isValidCoordinates(x: number, y: number): boolean {
@@ -144,13 +157,13 @@ export class Board {
     const number1 = this.getNumber(x1, y1);
 
     this.setNumber(x1, y1, number0);
-    if (number0 === 0) {
+    if (number0 === EMPTINESS) {
       this.x = x1;
       this.y = y1;
     }
 
     this.setNumber(x0, y0, number1);
-    if (number1 === 0) {
+    if (number1 === EMPTINESS) {
       this.x = x0;
       this.y = y0;
     }
@@ -167,12 +180,14 @@ export class Board {
   public isCompleted(): boolean {
     let prevNumber = 0;
 
+    // the game board size is small that is why linear complexity is good for us
     for (let i = 0; ; i++) {
-      const x = i % BOARD_SIDE_SIZE;
-      const y = Math.floor(i / BOARD_SIDE_SIZE);
+      const x = i % this.config.sideSize;
+      const y = Math.floor(i / this.config.sideSize);
 
-      const number = this.getNumber(x, y, false);
-      if (number === 0) {
+      const number = this.numbers[y][x];
+
+      if (number === EMPTINESS) {
         continue;
       }
 
@@ -180,7 +195,7 @@ export class Board {
         return false;
       }
 
-      if (number === BOARD_MAX_NUMBER) {
+      if (number === this.config.maxNumber) {
         return true;
       }
 
@@ -189,15 +204,16 @@ export class Board {
   }
 }
 
-export enum MoveDirection {
-  UP = 'UP',
-  DOWN = 'DOWN',
-  LEFT = 'LEFT',
-  RIGHT = 'RIGHT',
-}
+type MoveDirection = 'up' | 'down' | 'left' | 'right';
 
-export interface BoardState {
-  x: number;
-  y: number;
-  numbers: number[][];
-};
+export interface BoardConfig {
+  /**
+   * The size of board's side.
+   */
+  readonly sideSize: number;
+
+  /**
+   * The maximum number inside the board.
+   */
+  readonly maxNumber: number;
+}

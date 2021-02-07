@@ -1,28 +1,36 @@
 import readline from 'readline';
 
-import { INPUT_PROMPT } from 'src/config';
-import { Command, Input } from 'src/domain/puzzle';
+import { Command, I18n, Input } from 'src/domain/contract';
 
 /**
  * Simple keyboard input.
  */
 export class KeyboardInput implements Input {
-  private readonly input = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
+  private readonly i18n: I18n;
+  private input!: readline.Interface;
 
-  public getCommand(): Promise<Command> {
-    return new Promise(resolve => {
-      this.input.question(INPUT_PROMPT, string => {
-        const command = this.stringToCommand(string);
-        resolve(command);
-      });
+  constructor({ i18n }: { i18n: I18n }) {
+    this.i18n = i18n;
+  }
+
+  public start(): void {
+    this.input = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
     });
   }
 
   public stop(): void {
     this.input.close();
+  }
+
+  public getCommand(): Promise<Command> {
+    return new Promise(resolve => {
+      this.input.question(this.i18n.inputPrompt, string => {
+        const command = this.stringToCommand(string);
+        resolve(command);
+      });
+    });
   }
 
   private stringToCommand(string: string): Command {

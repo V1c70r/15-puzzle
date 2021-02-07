@@ -1,16 +1,25 @@
-import { Board, BoardState } from './board';
+import { Board, BoardConfig } from './board';
+import { Command, Display, I18n, Input, Service, Storage } from './contract'
 
 /**
  * 15 puzzle game logic.
  */
-export class Puzzle {
+export class Puzzle implements Service {
+  private readonly boardConfig: BoardConfig;
   private readonly storage: Storage;
   private readonly display: Display;
   private readonly input: Input;
   private readonly i18n: I18n;
   private board!: Board;
 
-  public constructor({storage, display, input, i18n}: PuzzleDependencies) {
+  public constructor({ boardConfig, storage, display, input, i18n }: {
+    boardConfig: BoardConfig;
+    storage: Storage;
+    display: Display;
+    input: Input;
+    i18n: I18n;
+  }) {
+    this.boardConfig = boardConfig;
     this.storage = storage;
     this.display = display;
     this.input = input;
@@ -18,121 +27,104 @@ export class Puzzle {
   }
 
   public async start() {
+    this.storage.start();
+    this.display.start();
+    this.input.start();
+    this.i18n.start();
+
     this.display.showMessage(this.i18n.greeting);
     this.display.showMessage(this.i18n.help);
 
-    const prevState = this.storage.load();
-    if (prevState) {
-      this.display.showMessage(this.i18n.gameLoaded);
-    } else {
-      this.display.showMessage(this.i18n.newGameCreated);
+    this.loadBoard();
+    if (!this.board) {
+      this.createNewBoard();
     }
-
-    this.board = new Board(prevState);
-    this.display.drawState(this.board.getState());
 
     try {
       while (true) {
         this.processCommand(await this.input.getCommand());
       }
     } catch (error) {
-      this.save();
+      this.saveBoard();
       throw error;
     }
+  }
+
+  public stop() {
+    this.saveBoard();
+
+    this.display.showMessage(this.i18n.goodbye);
+
+    this.i18n.stop();
+    this.input.stop();
+    this.display.stop();
+    this.storage.stop();
+
+    process.exit();
   }
 
   private processCommand(command: Command) {
     switch (command.type) {
       case 'move':
-        this.onMove(command.number);
+        this.moveNumber(command.number);
         break;
 
       case 'new':
-        this.onNew();
+        this.createNewBoard();
         break;
 
       case 'exit':
-        this.onExit();
+        this.stop();
         break;
 
       case 'unknown':
-        this.onUnknown();
+        this.showUnknownError();
         break;
     }
   }
 
-  private onMove(number: number) {
+  private moveNumber(number: number) {
     if (this.board.move(number)) {
-      this.display.drawState(this.board.getState());
+      this.drawState();
 
       if (this.board.isCompleted()) {
         this.display.showCongratulation(this.i18n.congratulation);
-        this.onNew();
+        this.createNewBoard();
       }
     } else {
       this.display.showError(this.i18n.cantMoveNumber(number));
     }
   }
 
-  private onNew() {
-    this.board = new Board();
+  private createNewBoard() {
+    this.board = new Board({ config: this.boardConfig });
+
     this.display.showMessage(this.i18n.newGameCreated);
-    this.display.drawState(this.board.getState());
-    this.save();
+    this.drawState();
+
+    this.saveBoard();
   }
 
-  private onExit() {
-    this.save();
-    this.display.showMessage(this.i18n.goodbye);
-    this.input.stop();
-    process.exit();
-  }
-
-  private onUnknown() {
+  private showUnknownError() {
     this.display.showError(this.i18n.unknownCommand);
     this.display.showMessage(this.i18n.help);
   }
 
-  private save() {
+  private loadBoard() {
+    const state = this.storage.load();
+    if (state) {
+      this.board = new Board({ config: this.boardConfig, state });
+      this.display.showMessage(this.i18n.gameLoaded);
+      this.drawState();
+    }
+  }
+
+  private saveBoard() {
     this.storage.save(this.board.getState());
     this.display.showMessage(this.i18n.gameSaved);
   }
-}
 
-export type Command = { type: 'move', number: number } | { type: 'new' } | { type: 'exit' } | { type: 'unknown' };
-
-export interface PuzzleDependencies {
-  storage: Storage;
-  display: Display;
-  input: Input;
-  i18n: I18n;
-}
-
-export interface Storage {
-  load(): BoardState | undefined;
-  save(state: BoardState): void;
-}
-
-export interface Display {
-  showMessage(message: string): void;
-  showError(error: string): void;
-  showCongratulation(message: string): void;
-  drawState(state: BoardState): void;
-}
-
-export interface Input {
-  getCommand(): Promise<Command>;
-  stop(): void;
-}
-
-export interface I18n {
-  greeting: string;
-  goodbye: string;
-  newGameCreated: string;
-  gameLoaded: string;
-  gameSaved: string;
-  congratulation: string;
-  cantMoveNumber: (number: number) => string;
-  unknownCommand: string;
-  help: string;
+  private drawState() {
+    this.display.drawState(this.board.getState());
+  }
 }

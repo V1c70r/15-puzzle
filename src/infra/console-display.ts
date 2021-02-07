@@ -1,40 +1,50 @@
-import { Display } from 'src/domain/puzzle';
-import { BoardState } from 'src/domain/board';
 import { repeat } from 'lodash';
-import { DISPLAY_NUMBER_WIDTH } from 'src/config';
+
+import { BoardConfig } from 'src/domain/board';
+import { BoardState, Display } from 'src/domain/contract';
+
+// TODO add chalk
 
 /**
  * Simple console display.
  */
 export class ConsoleDisplay implements Display {
-  private readonly spaces = repeat(' ', DISPLAY_NUMBER_WIDTH);
+  private readonly numberWidth: number;
+  private readonly spaces: string;
 
-  // TODO add print function
+  public constructor({ boardConfig }: { boardConfig: BoardConfig }) {
+    this.numberWidth = boardConfig.maxNumber.toString().length;
+    this.spaces = repeat(' ', this.numberWidth);
+  }
+
+  public start(): void {}
+
+  public stop(): void {}
 
   public showMessage(message: string): void {
-    console.log();
-    console.log(message);
-    console.log();
+    this.print();
+    this.print(message);
+    this.print();
   }
 
   public showError(error: string): void {
-    console.log();
-    console.log('ERROR', error);
-    console.log();
+    this.print();
+    this.print('ERROR', error);
+    this.print();
   }
 
   public showCongratulation(message: string): void {
-    console.log();
-    console.log('!!!', message, '!!!');
-    console.log();
+    this.print();
+    this.print('!!!', message, '!!!');
+    this.print();
   }
 
   public drawState({ numbers }: BoardState): void {
-    console.log();
+    this.print();
     numbers.forEach(row => {
-      console.log(row.map(number => this.formatNumber(number)).join(' '));
+      this.print(row.map(number => this.formatNumber(number)).join(' '));
     });
-    console.log();
+    this.print();
   }
 
   private formatNumber(number: number) {
@@ -42,6 +52,10 @@ export class ConsoleDisplay implements Display {
       return this.spaces;
     }
 
-    return (this.spaces + number).slice(-DISPLAY_NUMBER_WIDTH);
+    return (this.spaces + number).slice(-this.numberWidth);
+  }
+
+  private print(...strings: string[]) {
+    console.log(...strings);
   }
 }

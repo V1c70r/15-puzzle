@@ -1,20 +1,33 @@
 import fs from 'fs';
 
-import { Storage } from 'src/domain/puzzle';
-import { BoardState } from 'src/domain/board';
-import { STORAGE_IDENT_IN_STATE_FILE, STORAGE_STATE_FILE } from 'src/config';
+import { BoardState, Storage } from 'src/domain/contract';
 
 /**
  * Simple storage for the game state.
  */
 export class FileStorage implements Storage {
+  private readonly config: FileStorageConfig;
+
+  public constructor({ config }: { config: FileStorageConfig }) {
+    this.config = config;
+  }
+
+  public start(): void {}
+
+  public stop(): void {}
+
   public load(): BoardState | undefined {
-    if (fs.existsSync(STORAGE_STATE_FILE)) {
-      return JSON.parse(fs.readFileSync(STORAGE_STATE_FILE).toString());
+    if (fs.existsSync(this.config.filePath)) {
+      return JSON.parse(fs.readFileSync(this.config.filePath).toString());
     }
   }
 
   public save(state: BoardState): void {
-    fs.writeFileSync(STORAGE_STATE_FILE, JSON.stringify(state, null, STORAGE_IDENT_IN_STATE_FILE));
+    fs.writeFileSync(this.config.filePath, JSON.stringify(state, null, this.config.identInFile));
   }
+}
+
+export interface FileStorageConfig {
+  readonly filePath: string;
+  readonly identInFile: number;
 }
