@@ -12,11 +12,11 @@
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}/index.ts",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "runtimeArgs": ["-r", "ts-node/register", "-r", "tsconfig-paths/register"],
       "outFiles": [
         "${workspaceFolder}/**/*.js"
       ],
-      "outputCapture": "std",
+      "console": "integratedTerminal",
     }
   ]
 }

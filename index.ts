@@ -1,3 +1,3 @@
-const msg: string = 'Hello!';
+import { bootstrap } from "src/bootstrap";
 
-console.log('Hello!');
+bootstrap();
