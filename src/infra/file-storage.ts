@@ -6,7 +6,7 @@ import { BoardState, Storage } from 'src/domain/contract';
  * Simple storage for the game state.
  */
 export class FileStorage implements Storage {
-  private readonly config: FileStorageConfig;
+  protected readonly config: FileStorageConfig;
 
   public constructor({ config }: { config: FileStorageConfig }) {
     this.config = config;

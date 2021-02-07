@@ -6,8 +6,8 @@ import { Command, I18n, Input } from 'src/domain/contract';
  * Simple keyboard input.
  */
 export class KeyboardInput implements Input {
-  private readonly i18n: I18n;
-  private input!: readline.Interface;
+  protected readonly i18n: I18n;
+  protected input!: readline.Interface;
 
   public constructor({ i18n }: { i18n: I18n }) {
     this.i18n = i18n;
@@ -33,7 +33,7 @@ export class KeyboardInput implements Input {
     });
   }
 
-  private stringToCommand(string: string): Command {
+  protected stringToCommand(string: string): Command {
     switch (string) {
       case 'new':
         return { type: 'new' };

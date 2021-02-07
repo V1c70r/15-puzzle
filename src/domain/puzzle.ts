@@ -54,7 +54,7 @@ export class Puzzle implements Service {
     if (error) {
       throw error;
     } else {
-      this.stopProcess();
+      process.exit();
     }
   }
 
@@ -62,10 +62,6 @@ export class Puzzle implements Service {
     while (true) {
       this.processCommand(await this.input.getCommand());
     }
-  }
-
-  protected stopProcess(): never {
-    process.exit();
   }
 
   protected processCommand(command: Command): void {

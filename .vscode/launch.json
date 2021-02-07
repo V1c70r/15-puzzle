@@ -17,9 +17,7 @@
       "type": "node",
       "request": "launch",
       "name": "debug tests",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceRoot}/node_modules/.bin/jest",
       "runtimeArgs": ["--inspect-brk"],
       "args": ["--runInBand"],

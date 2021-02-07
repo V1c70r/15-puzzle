@@ -1,6 +1,6 @@
 import { Puzzle } from './puzzle';
 import { Board, BoardConfig } from './board';
-import { Display, I18n, Input, PuzzleDependencies, Storage } from './contract';
+import { BoardState, Command, Display, I18n, Input, PuzzleDependencies, Storage } from './contract';
 
 class TestPuzzle extends Puzzle {
   public readonly boardConfig!: BoardConfig;
@@ -20,6 +20,26 @@ class TestPuzzle extends Puzzle {
 
   public createNewBoard(): void {
     super.createNewBoard();
+  }
+
+  public processCommand(command: Command): void {
+    super.processCommand(command);
+  }
+
+  public moveNumber(number: number): void {
+    super.moveNumber(number);
+  }
+
+  public showUnknownError(): void {
+    super.showUnknownError();
+  }
+
+  public saveBoard(): void {
+    super.saveBoard();
+  }
+
+  public drawState(): void {
+    super.drawState();
   }
 }
 
@@ -134,7 +154,7 @@ describe('Puzzle', () => {
     });
 
     it('creates a new board if there is no saved board', async () => {
-      jest.spyOn(puzzle, 'loadBoard').mockImplementation(() => {});
+      jest.spyOn(puzzle, 'loadBoard').mockImplementation();
       const spyOnCreateNewBoard = jest.spyOn(puzzle, 'createNewBoard');
 
       expect(spyOnCreateNewBoard).not.toHaveBeenCalled();
@@ -144,64 +164,246 @@ describe('Puzzle', () => {
       expect(spyOnCreateNewBoard).toHaveBeenCalled();
     });
 
-    it.todo('starts processing cycle');
+    it('starts processing cycle', async () => {
+      const spyOnProcessingCycle = jest.spyOn(puzzle, 'processingCycle').mockImplementation();
 
-    it.todo('stops the game if an error is thrown');
+      expect(spyOnProcessingCycle).not.toHaveBeenCalled();
+
+      await puzzle.start();
+
+      expect(spyOnProcessingCycle).toHaveBeenCalled();
+    });
+
+    it('stops with an error if processing cycle failed', async () => {
+      const spyOnStop = jest.spyOn(puzzle, 'stop').mockImplementation();
+      jest.spyOn(puzzle, 'processingCycle').mockImplementation(() => {
+        throw new Error('Ups!');
+      });
+
+      expect(spyOnStop).not.toHaveBeenCalled();
+
+      await puzzle.start();
+
+      expect(spyOnStop).toHaveBeenCalled();
+      expect(spyOnStop.mock.calls[0].toString()).toBe('Error: Ups!');
+    });
   });
 
   describe('stop', () => {
-    it.todo('saves a board');
+    let spyOnProcessExit: jest.SpyInstance;
+    let spyOnSaveBoard: jest.SpyInstance;
 
-    it.todo('shows goodbye message');
+    beforeEach(() => {
+      spyOnProcessExit = jest.spyOn(process, 'exit').mockImplementation();
+      spyOnSaveBoard = jest.spyOn(puzzle, 'saveBoard').mockImplementation();
+    });
 
-    it.todo('stops dependencies');
+    it('saves a board', () => {
+      expect(spyOnSaveBoard).not.toHaveBeenCalled();
 
-    it.todo('stops the process without arguments');
+      puzzle.stop();
 
-    it.todo('throws an error if it is given');
+      expect(spyOnSaveBoard).toHaveBeenCalled();
+    });
+
+    it('shows goodbye message', () => {
+      expect(dependencies.display.showMessage).not.toHaveBeenCalledWith(dependencies.i18n.goodbye);
+
+      puzzle.stop();
+
+      expect(dependencies.display.showMessage).toHaveBeenCalledWith(dependencies.i18n.goodbye);
+    });
+
+    it('stops dependencies', () => {
+      expect(dependencies.storage.stop).not.toHaveBeenCalled();
+      expect(dependencies.display.stop).not.toHaveBeenCalled();
+      expect(dependencies.input.stop).not.toHaveBeenCalled();
+      expect(dependencies.i18n.stop).not.toHaveBeenCalled();
+
+      puzzle.stop();
+
+      expect(dependencies.storage.stop).toHaveBeenCalledTimes(1);
+      expect(dependencies.display.stop).toHaveBeenCalledTimes(1);
+      expect(dependencies.input.stop).toHaveBeenCalledTimes(1);
+      expect(dependencies.i18n.stop).toHaveBeenCalledTimes(1);
+    });
+
+    it('stops the process if no argument given', () => {
+      expect(spyOnProcessExit).not.toHaveBeenCalled();
+
+      puzzle.stop();
+
+      expect(spyOnProcessExit).toHaveBeenCalled();
+    });
+
+    it('throws an error if it is given', () => {
+      expect(() => puzzle.stop(new Error('Ups!'))).toThrow('Ups!');
+    });
   });
 
   describe('processingCycle', () => {
     it.todo('TODO');
   });
 
-  describe('stopProcess', () => {
-    it.todo('stops the process');
-  });
-
   describe('processCommand', () => {
-    it.todo('moves number for move command');
+    let spyOnMoveNumber: jest.SpyInstance;
+    let spyOnCreateNewBoard: jest.SpyInstance;
+    let spyOnStop: jest.SpyInstance;
+    let spyOnShowUnknownError: jest.SpyInstance;
 
-    it.todo('creates a new board for new command');
+    beforeEach(() => {
+      spyOnMoveNumber = jest.spyOn(puzzle, 'moveNumber').mockImplementation();
+      spyOnCreateNewBoard = jest.spyOn(puzzle, 'createNewBoard').mockImplementation();
+      spyOnStop = jest.spyOn(puzzle, 'stop').mockImplementation();
+      spyOnShowUnknownError = jest.spyOn(puzzle, 'showUnknownError').mockImplementation();
+    });
 
-    it.todo('stops the game for exit command');
+    it('moves number for move command', () => {
+      puzzle.processCommand({ type: 'move', number: 10 });
 
-    it.todo('shows unkwnown error for unkwnown command');
+      expect(spyOnMoveNumber).toHaveBeenCalledWith(10);
+      expect(spyOnCreateNewBoard).not.toHaveBeenCalled();
+      expect(spyOnStop).not.toHaveBeenCalled();
+      expect(spyOnShowUnknownError).not.toHaveBeenCalled();
+    });
+
+    it('creates a new board for new command', () => {
+      puzzle.processCommand({ type: 'new' });
+
+      expect(spyOnMoveNumber).not.toHaveBeenCalled();
+      expect(spyOnCreateNewBoard).toHaveBeenCalled();
+      expect(spyOnStop).not.toHaveBeenCalled();
+      expect(spyOnShowUnknownError).not.toHaveBeenCalled();
+    });
+
+    it('stops the game for exit command', () => {
+      puzzle.processCommand({ type: 'exit' });
+
+      expect(spyOnMoveNumber).not.toHaveBeenCalled();
+      expect(spyOnCreateNewBoard).not.toHaveBeenCalled();
+      expect(spyOnStop).toHaveBeenCalled();
+      expect(spyOnShowUnknownError).not.toHaveBeenCalled();
+    });
+
+    it('shows unknown error for unknown command', () => {
+      puzzle.processCommand({ type: 'unknown' });
+
+      expect(spyOnMoveNumber).not.toHaveBeenCalled();
+      expect(spyOnCreateNewBoard).not.toHaveBeenCalled();
+      expect(spyOnStop).not.toHaveBeenCalled();
+      expect(spyOnShowUnknownError).toHaveBeenCalled();
+    });
   });
 
   describe('moveNumber', () => {
-    describe('an invalid number', () => {
-      it.todo('shows an error');
+    beforeEach(async () => {
+      jest.spyOn(dependencies.storage, 'load').mockImplementation(
+        (): BoardState => ({
+          x: 0,
+          y: 0,
+          numbers: [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+            [8, 9, 10, 11],
+            [12, 13, 14, 15],
+          ],
+        }),
+      );
 
-      it.todo('does not change the board');
+      jest.spyOn(puzzle, 'processingCycle').mockImplementation();
+
+      await puzzle.start();
+    });
+
+    describe('an invalid number', () => {
+      it('shows an error', () => {
+        expect(dependencies.display.showError).not.toHaveBeenCalledWith(
+          dependencies.i18n.cantMoveNumber(1000),
+        );
+
+        puzzle.moveNumber(1000);
+
+        expect(dependencies.display.showError).toHaveBeenCalledWith(
+          dependencies.i18n.cantMoveNumber(1000),
+        );
+      });
+
+      it('does not change the board', () => {
+        puzzle.moveNumber(1000);
+
+        expect(puzzle.board.getState()).toEqual({
+          x: 0,
+          y: 0,
+          numbers: [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+            [8, 9, 10, 11],
+            [12, 13, 14, 15],
+          ],
+        });
+      });
     });
 
     describe('a not movable number', () => {
-      it.todo('shows an error');
+      it('shows an error', () => {
+        expect(dependencies.display.showError).not.toHaveBeenCalledWith(
+          dependencies.i18n.cantMoveNumber(10),
+        );
 
-      it.todo('does not change the board');
-    });
+        puzzle.moveNumber(10);
 
-    describe('a moveable number', () => {
-      it.todo('moves the number inside the board');
+        expect(dependencies.display.showError).toHaveBeenCalledWith(
+          dependencies.i18n.cantMoveNumber(10),
+        );
+      });
 
-      it.todo('draws a new state of the board');
+      it('does not change the board', () => {
+        puzzle.moveNumber(10);
 
-      it.todo('does not show congratulation if the board is not completed');
+        expect(puzzle.board.getState()).toEqual({
+          x: 0,
+          y: 0,
+          numbers: [
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+            [8, 9, 10, 11],
+            [12, 13, 14, 15],
+          ],
+        });
+      });
 
-      it.todo('shows congratulation if the board is completed');
+      describe('a moveable number', () => {
+        it('moves the number inside the board', () => {
+          const spyOnMove = jest.spyOn(puzzle.board, 'move').mockImplementation();
 
-      it.todo('creates a new board if the board is completed');
+          expect(spyOnMove).not.toHaveBeenCalled();
+
+          puzzle.moveNumber(1);
+
+          expect(spyOnMove).toHaveBeenCalledWith(1);
+        });
+
+        it('draws a new state of the board', () => {
+          puzzle.moveNumber(1);
+
+          expect(dependencies.display.drawState).toHaveBeenCalledWith({
+            x: 1,
+            y: 0,
+            numbers: [
+              [1, 0, 2, 3],
+              [4, 5, 6, 7],
+              [8, 9, 10, 11],
+              [12, 13, 14, 15],
+            ],
+          });
+        });
+
+        it.todo('does not show congratulation if the board is not completed');
+
+        it.todo('shows congratulation if the board is completed');
+
+        it.todo('creates a new board if the board is completed');
+      });
     });
 
     describe('createNewBoard', () => {

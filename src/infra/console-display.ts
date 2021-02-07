@@ -43,7 +43,7 @@ export class ConsoleDisplay implements Display {
     this.print();
   }
 
-  private formatNumber(number: number): string {
+  protected formatNumber(number: number): string {
     if (number === EMPTINESS) {
       return ''.padStart(this.maxNumberWidth);
     }
@@ -51,7 +51,7 @@ export class ConsoleDisplay implements Display {
     return number.toString().padStart(this.maxNumberWidth);
   }
 
-  private print(...strings: string[]): void {
+  protected print(...strings: string[]): void {
     // eslint-disable-next-line no-console
     console.log(...strings);
   }
