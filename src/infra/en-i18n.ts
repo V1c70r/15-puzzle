@@ -15,7 +15,7 @@ export class EnI18n implements I18n {
   public readonly newGameCreated = 'New game started.';
   public readonly gameLoaded = 'Game is loaded.';
   public readonly gameSaved = 'Game is saved.';
-  public readonly congratulation = 'You win!';
+  public readonly congratulation = 'Winner, Winner, Chicken, Dinner.';
   public readonly unknownCommand = 'You entered an unknown command.';
   public help!: string;
 

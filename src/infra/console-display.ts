@@ -1,16 +1,21 @@
+import chalk from 'chalk';
+import { repeat } from 'lodash';
+
 import { BoardConfig } from 'src/domain/board';
 import { BoardState, Display, EMPTINESS } from 'src/domain/contract';
-
-// TODO add chalk
 
 /**
  * Simple console display.
  */
 export class ConsoleDisplay implements Display {
+  protected readonly boardConfig: BoardConfig;
   protected readonly maxNumberWidth: number;
+  protected readonly lineSize: number;
 
   public constructor({ boardConfig }: { boardConfig: BoardConfig }) {
+    this.boardConfig = boardConfig;
     this.maxNumberWidth = boardConfig.maxNumber.toString().length;
+    this.lineSize = (this.maxNumberWidth + 1) * this.boardConfig.sideSize + 4;
   }
 
   public start(): void {}
@@ -18,28 +23,33 @@ export class ConsoleDisplay implements Display {
   public stop(): void {}
 
   public showMessage(message: string): void {
-    this.print();
-    this.print(message);
+    this.print(chalk.bold(message));
     this.print();
   }
 
   public showError(error: string): void {
-    this.print();
-    this.print('ERROR', error);
+    this.print(chalk.red.bold(error));
     this.print();
   }
 
   public showCongratulation(congratulation: string): void {
-    this.print();
-    this.print('!!!', congratulation, '!!!');
+    for (let i = 0; i < 30; i++) {
+      this.print();
+    }
+    this.print(chalk.green.bold(congratulation));
     this.print();
   }
 
   public drawState({ numbers }: BoardState): void {
-    this.print();
+    this.print(chalk.bgGreen(repeat(' ', this.lineSize)));
+
     numbers.forEach(row => {
-      this.print(row.map(number => this.formatNumber(number)).join(' '));
+      this.print(
+        chalk.bgGreen.bold('  ' + row.map(number => this.formatNumber(number)).join(' ') + '   '),
+      );
     });
+
+    this.print(chalk.bgGreen(repeat(' ', this.lineSize)));
     this.print();
   }
 
