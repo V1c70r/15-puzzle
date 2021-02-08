@@ -8,12 +8,76 @@ import {
 describe('isSolvable', () => {
   it('returns true if array is solvable', () => {
     // see https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
-    expect(isSolvable([1, 8, 2, 0, 4, 3, 7, 6, 5])).toBe(true);
-    expect(isSolvable([13, 2, 10, 3, 1, 12, 8, 4, 5, 0, 9, 6, 15, 14, 11, 7])).toBe(true);
-    expect(isSolvable([6, 13, 7, 10, 8, 9, 11, 0, 15, 2, 12, 5, 14, 3, 1, 4])).toBe(true);
-    expect(isSolvable([3, 9, 1, 15, 14, 11, 4, 6, 13, 0, 10, 12, 2, 7, 8, 5])).toBe(false);
-    expect(isSolvable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 14, 15])).toBe(true);
-    expect(isSolvable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 15, 14])).toBe(false);
+
+    const getIndexAndNumbers = (numbers: number[][]): [number, number[]] => {
+      const flatNumbers = numbers.flatMap(row => row);
+      return [flatNumbers.indexOf(0), flatNumbers.filter(v => v !== 0)];
+    };
+
+    expect(
+      isSolvable(
+        ...getIndexAndNumbers([
+          [1, 8, 2],
+          [0, 4, 3],
+          [7, 6, 5],
+        ]),
+      ),
+    ).toBe(true);
+
+    expect(
+      isSolvable(
+        ...getIndexAndNumbers([
+          [13, 2, 10, 3],
+          [1, 12, 8, 4],
+          [5, 0, 9, 6],
+          [15, 14, 11, 7],
+        ]),
+      ),
+    ).toBe(true);
+
+    expect(
+      isSolvable(
+        ...getIndexAndNumbers([
+          [6, 13, 7, 10],
+          [8, 9, 11, 0],
+          [15, 2, 12, 5],
+          [14, 3, 1, 4],
+        ]),
+      ),
+    ).toBe(true);
+
+    expect(
+      isSolvable(
+        ...getIndexAndNumbers([
+          [3, 9, 1, 15],
+          [14, 11, 4, 6],
+          [13, 0, 10, 12],
+          [2, 7, 8, 5],
+        ]),
+      ),
+    ).toBe(false);
+
+    expect(
+      isSolvable(
+        ...getIndexAndNumbers([
+          [1, 2, 3, 4],
+          [5, 6, 7, 8],
+          [9, 10, 11, 12],
+          [13, 0, 14, 15],
+        ]),
+      ),
+    ).toBe(true);
+
+    expect(
+      isSolvable(
+        ...getIndexAndNumbers([
+          [1, 2, 3, 4],
+          [5, 6, 7, 8],
+          [9, 10, 11, 12],
+          [13, 0, 15, 14],
+        ]),
+      ),
+    ).toBe(false);
   });
 
   it('should not change original array', () => {

@@ -108,7 +108,12 @@ describe('Board', () => {
       it('returns only solvable numbers', () => {
         for (let i = 0; i < 10; i++) {
           const numbers = board.createRandomState().numbers.flatMap(rows => rows);
-          expect(isSolvable(numbers)).toBe(true);
+          expect(
+            isSolvable(
+              numbers.indexOf(0),
+              numbers.filter(v => v !== 0),
+            ),
+          ).toBe(true);
         }
       });
     });

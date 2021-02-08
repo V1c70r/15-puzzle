@@ -1,22 +1,15 @@
-import { EMPTINESS } from './contract';
-
 /**
  * Check if puzzle solvable.
  * @see https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
- * @param numbers A flat array of puzzle numbers. It must have N**2 elements.
+ * @param numbers A flat array of puzzle numbers without EMPTINESS (0). It must have (N**2)-1 elements.
  */
-export function isSolvable(numbers: number[]): boolean {
-  const sideSize = Math.floor(Math.sqrt(numbers.length));
+export function isSolvable(emptinessIndex: number, numberWithoutEmptiness: number[]): boolean {
+  const sideSize = Math.ceil(Math.sqrt(numberWithoutEmptiness.length));
   const sizeParity = sideSize % 2;
 
-  const emptinessIndex = numbers.indexOf(EMPTINESS);
   const emptinessRowIndex = Math.floor(emptinessIndex / sideSize);
   const emptinessRowParity = (sideSize - emptinessRowIndex) % 2; // counting from the bottom;
 
-  const numberWithoutEmptiness = [
-    ...numbers.slice(0, emptinessIndex),
-    ...numbers.slice(emptinessIndex + 1),
-  ];
   const inversionsParity = countInversion(numberWithoutEmptiness) % 2;
 
   // is odd
