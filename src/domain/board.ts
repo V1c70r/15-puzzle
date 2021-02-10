@@ -1,5 +1,6 @@
-import { chunk, range, shuffle } from 'lodash';
+import { chunk, range, shuffle, random } from 'lodash';
 
+import { isSolvable } from './solvable';
 import { EMPTINESS, BoardState } from './contract';
 
 /**
@@ -47,14 +48,19 @@ export class Board {
   }
 
   protected createRandomState(): BoardState {
-    const numbers = chunk(shuffle(range(this.config.maxNumber + 1)), this.config.sideSize);
+    const flatNumbers = shuffle(range(1, this.config.maxNumber + 1));
+    const emptinessIndex = random(0, this.config.maxNumber);
 
-    const [x, y] = numbers.flatMap((rows, y) => {
-      const x = rows.indexOf(EMPTINESS);
-      return x === -1 ? [] : [x, y];
-    });
+    if (!isSolvable(emptinessIndex, flatNumbers)) {
+      [flatNumbers[0], flatNumbers[1]] = [flatNumbers[1], flatNumbers[0]];
+    }
+    flatNumbers.splice(emptinessIndex, 0, EMPTINESS); // insert emptiness
 
-    return { x, y, numbers };
+    return {
+      x: emptinessIndex % this.config.sideSize,
+      y: Math.floor(emptinessIndex / this.config.sideSize),
+      numbers: chunk(flatNumbers, this.config.sideSize),
+    };
   }
 
   /**

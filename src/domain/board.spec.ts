@@ -1,5 +1,6 @@
 import { range } from 'lodash';
 
+import { isSolvable } from './solvable';
 import { BoardState } from './contract';
 import { Board, BoardConfig } from './board';
 
@@ -102,6 +103,18 @@ describe('Board', () => {
 
       it('returns random numbers', () => {
         expect(board.createRandomState().numbers).not.toEqual(board.createRandomState().numbers);
+      });
+
+      it('returns only solvable numbers', () => {
+        for (let i = 0; i < 10; i++) {
+          const numbers = board.createRandomState().numbers.flatMap(rows => rows);
+          expect(
+            isSolvable(
+              numbers.indexOf(0),
+              numbers.filter(v => v !== 0),
+            ),
+          ).toBe(true);
+        }
       });
     });
   });
