@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "check": "npm run test:coverage && npm run lint:fix && npm run format:fix && npm run build",
-    "check:strict": "npm test && npm run lint:check && npm run format:check && npm run build"
+    "check:strict": "npm test && npm run lint:check && npm run format:check && npm run build",
+    "gh-pages": "npm --prefix src/infra/svelte --prefix run build && cp -r src/infra/svelte/public/ docs"
   },
   "repository": {
     "type": "git",
