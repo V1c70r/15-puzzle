@@ -8,14 +8,24 @@ import { BoardState, Display, EMPTINESS } from 'src/domain/contract';
  * Simple console display.
  */
 export class ConsoleDisplay implements Display {
+  protected readonly config: ConsoleDisplayConfig;
   protected readonly boardConfig: BoardConfig;
   protected readonly maxNumberWidth: number;
-  protected readonly lineSize: number;
+  protected readonly boardEmptyLine: string;
 
-  public constructor({ boardConfig }: { boardConfig: BoardConfig }) {
+  public constructor({
+    config,
+    boardConfig,
+  }: {
+    config: ConsoleDisplayConfig;
+    boardConfig: BoardConfig;
+  }) {
+    this.config = config;
     this.boardConfig = boardConfig;
     this.maxNumberWidth = boardConfig.maxNumber.toString().length;
-    this.lineSize = (this.maxNumberWidth + 1) * this.boardConfig.sideSize + 4;
+
+    const lineSize = (this.maxNumberWidth + 1) * this.boardConfig.sideSize + 4;
+    this.boardEmptyLine = chalk.bgGreen(repeat(' ', lineSize));
   }
 
   public start(): void {}
@@ -33,7 +43,7 @@ export class ConsoleDisplay implements Display {
   }
 
   public showCongratulation(congratulation: string): void {
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < this.config.newGamePaddingSize; i++) {
       this.print();
     }
     this.print(chalk.green.bold(congratulation));
@@ -41,7 +51,7 @@ export class ConsoleDisplay implements Display {
   }
 
   public drawState({ numbers }: BoardState): void {
-    this.print(chalk.bgGreen(repeat(' ', this.lineSize)));
+    this.print(this.boardEmptyLine);
 
     numbers.forEach(row => {
       this.print(
@@ -49,7 +59,7 @@ export class ConsoleDisplay implements Display {
       );
     });
 
-    this.print(chalk.bgGreen(repeat(' ', this.lineSize)));
+    this.print(this.boardEmptyLine);
     this.print();
   }
 
@@ -65,4 +75,11 @@ export class ConsoleDisplay implements Display {
     // eslint-disable-next-line no-console
     console.log(...strings);
   }
+}
+
+export interface ConsoleDisplayConfig {
+  /**
+   * A number of empty lines to separate a new and an old game.
+   */
+  newGamePaddingSize: number;
 }

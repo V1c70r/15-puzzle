@@ -1,4 +1,5 @@
 module.exports = {
+  ignorePatterns: ['src/infra/svelte/**/*.ts'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: 'tsconfig.json',
@@ -97,18 +98,11 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['src/config.ts'],
-      rules: {
-        '@typescript-eslint/no-magic-numbers': 'off'
-      },
-    },
-    {
-      files: ['src/**/*.spec.ts'],
+      files: ['**/*.spec.ts'],
       rules: {
         'max-lines-per-function': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
         '@typescript-eslint/unbound-method': 'off',
-        '@typescript-eslint/no-magic-numbers': 'off',
         '@typescript-eslint/no-unsafe-return': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'off',
       },

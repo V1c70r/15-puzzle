@@ -1,6 +1,14 @@
-import { Puzzle } from './puzzle';
-import { Board, BoardConfig } from './board';
-import { BoardState, Command, Display, I18n, Input, PuzzleDependencies, Storage } from './contract';
+import { Puzzle } from 'src/domain/puzzle';
+import { Board, BoardConfig } from 'src/domain/board';
+import {
+  BoardState,
+  Command,
+  Display,
+  I18n,
+  Input,
+  PuzzleDependencies,
+  Storage,
+} from 'src/domain/contract';
 
 class TestPuzzle extends Puzzle {
   public readonly boardConfig!: BoardConfig;
@@ -9,10 +17,6 @@ class TestPuzzle extends Puzzle {
   public readonly input!: Input;
   public readonly i18n!: I18n;
   public board!: Board;
-
-  public processingCycle(): Promise<never> {
-    return super.processingCycle();
-  }
 
   public loadBoard(): void {
     super.loadBoard();
@@ -52,14 +56,10 @@ describe('Puzzle', () => {
         maxNumber: 15,
       },
       storage: {
-        start: jest.fn(),
-        stop: jest.fn(),
         load: jest.fn(),
         save: jest.fn(),
       },
       display: {
-        start: jest.fn(),
-        stop: jest.fn(),
         showMessage: jest.fn(),
         showError: jest.fn(),
         showCongratulation: jest.fn(),
@@ -68,22 +68,20 @@ describe('Puzzle', () => {
       input: {
         start: jest.fn(),
         stop: jest.fn(),
-        getCommand: jest.fn(),
       },
       i18n: {
-        start: jest.fn(),
-        stop: jest.fn(),
+        init: jest.fn(),
         inputPrompt: 'INPUT PROMPT',
         greeting: 'GREETING',
         goodbye: 'GOODBYE',
         newGameCreated: 'NEW GAME CREATED',
         gameLoaded: 'GAME LOADED',
-        gameSaved: 'GAME SAVED',
         congratulation: 'CONGRATULATION',
         unknownCommand: 'UNKNOWN COMMAND',
         help: 'HELP',
         cantMoveNumber: (number: number) => `CAN NOT MOVE ${number}`,
       },
+      processExit: jest.fn(),
     };
   });
 
@@ -103,22 +101,15 @@ describe('Puzzle', () => {
   });
 
   describe('start', () => {
-    beforeEach(() => {
-      jest.spyOn(puzzle, 'processingCycle').mockImplementation();
-    });
-
     it('starts dependencies', async () => {
-      expect(dependencies.storage.start).not.toHaveBeenCalled();
-      expect(dependencies.display.start).not.toHaveBeenCalled();
       expect(dependencies.input.start).not.toHaveBeenCalled();
-      expect(dependencies.i18n.start).not.toHaveBeenCalled();
+      expect(dependencies.i18n.init).not.toHaveBeenCalled();
 
       await puzzle.start();
 
-      expect(dependencies.storage.start).toHaveBeenCalledTimes(1);
-      expect(dependencies.display.start).toHaveBeenCalledTimes(1);
       expect(dependencies.input.start).toHaveBeenCalledTimes(1);
-      expect(dependencies.i18n.start).toHaveBeenCalledTimes(1);
+      expect(dependencies.input.start).toHaveBeenCalledWith(expect.any(Function));
+      expect(dependencies.i18n.init).toHaveBeenCalledTimes(1);
     });
 
     it('shows greeting message', async () => {
@@ -163,38 +154,12 @@ describe('Puzzle', () => {
 
       expect(spyOnCreateNewBoard).toHaveBeenCalled();
     });
-
-    it('starts processing cycle', async () => {
-      const spyOnProcessingCycle = jest.spyOn(puzzle, 'processingCycle').mockImplementation();
-
-      expect(spyOnProcessingCycle).not.toHaveBeenCalled();
-
-      await puzzle.start();
-
-      expect(spyOnProcessingCycle).toHaveBeenCalled();
-    });
-
-    it('stops with an error if processing cycle failed', async () => {
-      const spyOnStop = jest.spyOn(puzzle, 'stop').mockImplementation();
-      jest.spyOn(puzzle, 'processingCycle').mockImplementation(() => {
-        throw new Error('Ups!');
-      });
-
-      expect(spyOnStop).not.toHaveBeenCalled();
-
-      await puzzle.start();
-
-      expect(spyOnStop).toHaveBeenCalled();
-      expect(spyOnStop.mock.calls[0].toString()).toBe('Error: Ups!');
-    });
   });
 
   describe('stop', () => {
-    let spyOnProcessExit: jest.SpyInstance;
     let spyOnSaveBoard: jest.SpyInstance;
 
     beforeEach(() => {
-      spyOnProcessExit = jest.spyOn(process, 'exit').mockImplementation();
       spyOnSaveBoard = jest.spyOn(puzzle, 'saveBoard').mockImplementation();
     });
 
@@ -215,34 +180,20 @@ describe('Puzzle', () => {
     });
 
     it('stops dependencies', () => {
-      expect(dependencies.storage.stop).not.toHaveBeenCalled();
-      expect(dependencies.display.stop).not.toHaveBeenCalled();
       expect(dependencies.input.stop).not.toHaveBeenCalled();
-      expect(dependencies.i18n.stop).not.toHaveBeenCalled();
 
       puzzle.stop();
 
-      expect(dependencies.storage.stop).toHaveBeenCalledTimes(1);
-      expect(dependencies.display.stop).toHaveBeenCalledTimes(1);
       expect(dependencies.input.stop).toHaveBeenCalledTimes(1);
-      expect(dependencies.i18n.stop).toHaveBeenCalledTimes(1);
     });
 
     it('stops the process if no argument given', () => {
-      expect(spyOnProcessExit).not.toHaveBeenCalled();
+      expect(dependencies.processExit).not.toHaveBeenCalled();
 
       puzzle.stop();
 
-      expect(spyOnProcessExit).toHaveBeenCalled();
+      expect(dependencies.processExit).toHaveBeenCalled();
     });
-
-    it('throws an error if it is given', () => {
-      expect(() => puzzle.stop(new Error('Ups!'))).toThrow('Ups!');
-    });
-  });
-
-  describe('processingCycle', () => {
-    it.todo('TODO');
   });
 
   describe('processCommand', () => {
@@ -293,6 +244,18 @@ describe('Puzzle', () => {
       expect(spyOnStop).not.toHaveBeenCalled();
       expect(spyOnShowUnknownError).toHaveBeenCalled();
     });
+
+    it('saves and throws an error if process command failed', async () => {
+      const spyOnSaveBoard = jest.spyOn(puzzle, 'saveBoard').mockImplementation();
+      jest.spyOn(puzzle, 'moveNumber').mockImplementation(() => {
+        throw new Error('Ups!');
+      });
+
+      expect(spyOnSaveBoard).not.toHaveBeenCalled();
+      expect(() => puzzle.processCommand({ type: 'move', number: 10 })).toThrow('Ups!');
+
+      expect(spyOnSaveBoard).toHaveBeenCalled();
+    });
   });
 
   describe('moveNumber', () => {
@@ -309,8 +272,6 @@ describe('Puzzle', () => {
           ],
         }),
       );
-
-      jest.spyOn(puzzle, 'processingCycle').mockImplementation();
 
       await puzzle.start();
     });

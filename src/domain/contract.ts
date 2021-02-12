@@ -27,38 +27,35 @@ export interface PuzzleDependencies {
   display: Display;
   input: Input;
   i18n: I18n;
+  processExit: () => void;
 }
 
-export interface Storage extends Service {
+export interface Storage {
   load(): BoardState | undefined;
   save(state: BoardState): void;
 }
 
-export interface Display extends Service {
+export interface Display {
   showMessage(message: string): void;
   showError(error: string): void;
   showCongratulation(message: string): void;
   drawState(state: BoardState): void;
 }
 
-export interface Input extends Service {
-  getCommand(): Promise<Command>;
+export interface Input {
+  start(callback: (command: Command) => void): void;
+  stop(): void;
 }
 
-export interface I18n extends Service {
+export interface I18n {
   readonly inputPrompt: string;
   readonly greeting: string;
   readonly goodbye: string;
   readonly newGameCreated: string;
   readonly gameLoaded: string;
-  readonly gameSaved: string;
   readonly congratulation: string;
   readonly unknownCommand: string;
   readonly help: string;
   cantMoveNumber: (number: number) => string;
-}
-
-export interface Service {
-  start(): void;
-  stop(): void;
+  init(): void;
 }

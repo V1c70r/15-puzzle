@@ -1,30 +1,36 @@
 import { Board, BoardConfig } from './board';
-import { Command, Display, I18n, Input, PuzzleDependencies, Service, Storage } from './contract';
+import { Command, Display, I18n, Input, PuzzleDependencies, Storage } from './contract';
 
 /**
  * 15 puzzle game logic.
  */
-export class Puzzle implements Service {
+export class Puzzle {
   protected readonly boardConfig: BoardConfig;
   protected readonly storage: Storage;
   protected readonly display: Display;
   protected readonly input: Input;
   protected readonly i18n: I18n;
+  protected readonly processExit: () => void;
   protected board!: Board;
 
-  public constructor({ boardConfig, storage, display, input, i18n }: PuzzleDependencies) {
+  public constructor({
+    boardConfig,
+    storage,
+    display,
+    input,
+    i18n,
+    processExit,
+  }: PuzzleDependencies) {
     this.boardConfig = boardConfig;
     this.storage = storage;
     this.display = display;
     this.input = input;
     this.i18n = i18n;
+    this.processExit = processExit;
   }
 
   public async start(): Promise<void> {
-    this.storage.start();
-    this.display.start();
-    this.input.start();
-    this.i18n.start();
+    this.i18n.init();
 
     this.display.showMessage(this.i18n.greeting);
     this.display.showMessage(this.i18n.help);
@@ -34,53 +40,40 @@ export class Puzzle implements Service {
       this.createNewBoard();
     }
 
-    try {
-      await this.processingCycle();
-    } catch (error) {
-      this.stop(error);
-    }
+    this.input.start(command => this.processCommand(command));
   }
 
-  public stop(error?: Error): void {
+  public stop(): void {
     this.saveBoard();
 
     this.display.showMessage(this.i18n.goodbye);
-
-    this.i18n.stop();
     this.input.stop();
-    this.display.stop();
-    this.storage.stop();
 
-    if (error) {
-      throw error;
-    } else {
-      process.exit();
-    }
-  }
-
-  protected async processingCycle(): Promise<never> {
-    while (true) {
-      this.processCommand(await this.input.getCommand());
-    }
+    this.processExit();
   }
 
   protected processCommand(command: Command): void {
-    switch (command.type) {
-      case 'move':
-        this.moveNumber(command.number);
-        break;
+    try {
+      switch (command.type) {
+        case 'move':
+          this.moveNumber(command.number);
+          break;
 
-      case 'new':
-        this.createNewBoard();
-        break;
+        case 'new':
+          this.createNewBoard();
+          break;
 
-      case 'exit':
-        this.stop();
-        break;
+        case 'exit':
+          this.stop();
+          break;
 
-      case 'unknown':
-        this.showUnknownError();
-        break;
+        case 'unknown':
+          this.showUnknownError();
+          break;
+      }
+    } catch (error) {
+      this.saveBoard();
+      throw error;
     }
   }
 
@@ -91,6 +84,8 @@ export class Puzzle implements Service {
       if (this.board.isCompleted()) {
         this.display.showCongratulation(this.i18n.congratulation);
         this.createNewBoard();
+      } else {
+        this.saveBoard();
       }
     } else {
       this.display.showError(this.i18n.cantMoveNumber(number));
@@ -122,7 +117,6 @@ export class Puzzle implements Service {
 
   protected saveBoard(): void {
     this.storage.save(this.board.getState());
-    this.display.showMessage(this.i18n.gameSaved);
   }
 
   protected drawState(): void {

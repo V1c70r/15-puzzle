@@ -4,9 +4,9 @@ import { I18n } from 'src/domain/contract';
 import { BoardConfig } from 'src/domain/board';
 
 /**
- * English internationalization.
+ * English internationalization for CLI.
  */
-export class EnI18n implements I18n {
+export class ConsoleEnI18n implements I18n {
   protected readonly boardConfig: BoardConfig;
 
   public readonly inputPrompt = '> ';
@@ -15,7 +15,7 @@ export class EnI18n implements I18n {
   public readonly newGameCreated = 'New game started.';
   public readonly gameLoaded = 'Game is loaded.';
   public readonly gameSaved = 'Game is saved.';
-  public readonly congratulation = 'Winner, Winner, Chicken, Dinner.';
+  public readonly congratulation = 'WIN!';
   public readonly unknownCommand = 'You entered an unknown command.';
   public help!: string;
 
@@ -27,7 +27,7 @@ export class EnI18n implements I18n {
     return `You can't move ${number}.`;
   }
 
-  public start(): void {
+  public init(): void {
     this.help = [
       'Please input a command.',
       'Allowed commands:',
@@ -36,6 +36,4 @@ export class EnI18n implements I18n {
       '  exit - save and stop the game',
     ].join(EOL);
   }
-
-  public stop(): void {}
 }
