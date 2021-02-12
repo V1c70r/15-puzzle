@@ -13,11 +13,15 @@ export class KeyboardInput implements Input {
     this.i18n = i18n;
   }
 
-  public start(): void {
+  public async start(callback: (command: Command) => void): Promise<void> {
     this.input = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
     });
+
+    while (true) {
+      callback(await this.getCommand());
+    }
   }
 
   public stop(): void {

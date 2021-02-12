@@ -1,8 +1,8 @@
 import { range } from 'lodash';
 
-import { isSolvable } from './solvable';
-import { BoardState } from './contract';
-import { Board, BoardConfig } from './board';
+import { isSolvable } from 'src/domain/solvable';
+import { BoardState } from 'src/domain/contract';
+import { Board, BoardConfig } from 'src/domain/board';
 
 class TestBoard extends Board {
   public readonly config!: BoardConfig;

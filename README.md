@@ -6,11 +6,12 @@
 
 ## Installation
 
-`npm ci`
+`npm run setup`
 
 ## Run
 
-`npm start`
+`npm run start` - console version
+`npm run start:svelte` - browser version on port 5000
 
 ## CI status
 

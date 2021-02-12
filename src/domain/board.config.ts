@@ -1,4 +1,4 @@
-import { BoardConfig } from 'src/domain/board';
+import { BoardConfig } from './board';
 
 /**
  * The size of board's side.

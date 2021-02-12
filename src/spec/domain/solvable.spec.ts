@@ -3,16 +3,16 @@ import {
   countInversion,
   sortAndCountInversions,
   mergeAndCountInversions,
-} from './solvable';
+} from 'src/domain/solvable';
 
 describe('isSolvable', () => {
+  function getIndexAndNumbers(numbers: number[][]): [number, number[]] {
+    const flatNumbers = numbers.flatMap(row => row);
+    return [flatNumbers.indexOf(0), flatNumbers.filter(v => v !== 0)];
+  }
+
   it('returns true if array is solvable', () => {
     // see https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
-
-    const getIndexAndNumbers = (numbers: number[][]): [number, number[]] => {
-      const flatNumbers = numbers.flatMap(row => row);
-      return [flatNumbers.indexOf(0), flatNumbers.filter(v => v !== 0)];
-    };
 
     expect(
       isSolvable(
@@ -81,9 +81,13 @@ describe('isSolvable', () => {
   });
 
   it('should not change original array', () => {
-    const array = [4, 3, 1, 2];
+    const array = [
+      [1, 8, 2],
+      [0, 4, 3],
+      [7, 6, 5],
+    ];
 
-    expect(countInversion(array)).toEqual(5);
+    expect(isSolvable(...getIndexAndNumbers(array))).toBe(true);
     expect(array).toEqual(array);
   });
 });

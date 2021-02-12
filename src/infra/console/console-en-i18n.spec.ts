@@ -1,12 +1,12 @@
 import { BoardConfig } from 'src/domain/board';
 
-import { EnI18n } from './en-i18n';
+import { ConsoleEnI18n } from './console-en-i18n';
 
-class TestEnI18n extends EnI18n {
+class TestEnI18n extends ConsoleEnI18n {
   public readonly boardConfig!: BoardConfig;
 }
 
-describe('EnI18n', () => {
+describe('ConsoleEnI18n', () => {
   const boardConfig: BoardConfig = {
     sideSize: 4,
     maxNumber: 15,
@@ -23,9 +23,9 @@ describe('EnI18n', () => {
     });
   });
 
-  describe('start', () => {
-    it('has not empty strings after start', () => {
-      enI18n.start();
+  describe('init', () => {
+    it('has not empty strings after init', () => {
+      enI18n.init();
 
       expect(enI18n.inputPrompt).not.toBeFalsy();
       expect(enI18n.greeting).not.toBeFalsy();
@@ -36,12 +36,6 @@ describe('EnI18n', () => {
       expect(enI18n.congratulation).not.toBeFalsy();
       expect(enI18n.unknownCommand).not.toBeFalsy();
       expect(enI18n.help).not.toBeFalsy();
-    });
-  });
-
-  describe('stop', () => {
-    it('must not fail', () => {
-      expect(() => enI18n.stop()).not.toThrow();
     });
   });
 
