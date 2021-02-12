@@ -11,7 +11,12 @@
 ## Run
 
 `npm run start` - console version
+
 `npm run start:svelte` - browser version on port 5000
+
+or
+
+open [15 puzzle](https://v1c70r.github.io/15-puzzle/) in a browser
 
 ## CI status
 
